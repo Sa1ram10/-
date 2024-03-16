@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script> 
+    <title>சொல் விளையாட்டு</title>
+    <style>
+        body {
+            position: relative;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            background: url('https://w0.peakpx.com/wallpaper/702/486/HD-wallpaper-8-bit-pixel-galaxy.jpg') fixed;
+
+           
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5); 
+            z-index: -1;
+        }
+
+        header {
+            background-color: black;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        header img {
+            width: 100px; 
+            height: auto;
+            margin-right: 20px; 
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: white;
+        }
+        #game {
+            background-color: bisque;
+            height:auto;
+            width: 1050px;
+            padding: 20px;
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            margin: 50px 190px;
+
+        }
+
+        .game-title {
+            position: relative;
+            text-align: center;
+            font-size: 40px;
+            background-color: #FFA33C;
+            color: black;
+            border-radius: 20px;
+            margin: 10px; 
+            padding: 12px 10px;
+        }
+
+        #level-counter {
+            position: relative;
+            margin-top: 10px;
+            text-align: left; 
+            margin-left: 10px;
+            margin-bottom: 0px;
+            font-size:28px;
+        }
+        
+        #letters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .letter-tile {
+            width: 60px;
+            height: 60px;
+            background-color:  #485696;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-bottom: 20px;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .letter-tile:hover {
+            background-color: #209c91;
+            transform: scale(1.1);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+
+        #buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 2px solid #B15EFF;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color:  #485696;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background-color: #369e95; 
+            transform: scale(1.1); 
+            transition: background-color 0.3s ease, transform 0.3s ease; 
+        }
+
+        #constructed-word {
+            text-align: left;
+            margin-left: 50px;
+            font-size: 35px;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        #score-board {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        #score-board span {
+            margin-left: 10px;
+            font-size:28px;
+            font-weight: 550;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .current-letter{
+            font-size: 35px;
+            padding: 10px;
+            border: 2px solid black;
+            font-weight: 550;
+            margin: 15px;
+            display: inline-block; 
+            min-width: 50px;
+            min-height: 50px;
+            text-align: center; 
+            line-height: normal;
+            box-sizing: border-box;
+        }
+        #current-word{
+            margin: 0;
+        }
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            line-height: normal;
+        }
+        
+        .construction{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer{
+            display: flex;
+            justify-content: space-between;
+        }
+        .chosen-container{
+            display: inline-flex;
+            align-items: center;
+            float: left;
+            margin-top: 10px;
+        }
+        .validation{
+            margin-right: 30px;
+        }
+        .chosen-word{
+            font-size:15px;
+            font-weight: 550;
+            margin: 0 0 0 10px;
+        }
+        .chosen-container p{
+            border-bottom: 2px solid black;
+            font-size: 18px;
+            font-weight: 550;
+            margin: 0;
+        }
+        #timer{
+            float: right;
+            color:#004085;
+            background-color: #d2a5fc;
+            height: 45px;
+            padding: 0 8px;
+            width: 140px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #timer .timer_left_txt{
+            font-weight: 600;
+            font-size: 20px;
+            color: black;
+        }
+        #timer .timer_sec{
+            font-size: 18px;
+            font-weight: 500;
+            height: 30px;
+            width: 45px;
+            color: white;
+            border-radius: 5px;
+            line-height: 30px;
+            text-align: center;
+            background-color: #343a40;
+            border: 1px solid #343a60;
+        }
+        #bottomline {
+            border: 2px solid #B15EFF;
+            clear: both; 
+            margin: 0;
+            margin-left: 13px !important;
+            transition: width 0.5s ease;
+        }
+        #replay-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        #replay-popup .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #replay-popup #replay-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: bisque;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #replay-popup #replay-content h2 {
+            margin-bottom: 20px;
+        }
+
+        #replay-popup #replay-button {
+            padding: 10px 20px;
+            background-color: #485696;
+            color:  white;;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #replay-popup #replay-button:hover {
+            background-color: #369e95;
+        }
+        #animation-replay, .progress-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .circular-progress{
+            margin: 20px;
+            position: relative;
+            height: 250px;
+            width: 250px;
+            border-radius: 50%;
+            background: conic-gradient(#7d2ae8 3.6deg, #afaeae 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;    
+        }
+        .circular-progress::before{
+            content: '';
+            position: absolute;
+            height: 210px;
+            width: 210px;
+            border-radius: 50%;
+            background-color: rgb(251, 239, 224);
+        }
+        /* Styling for progress value */
+        .progress-value{
+            position:relative;
+            font-size: 40px;
+            font-weight: 600;
+            color:#7d2ae8;
+        }
+        @media only screen and (max-width: 768px) {
+            /* Adjustments for tablets and mobile devices */
+            body {
+                background-size: cover;
+            }
+
+            header {
+                padding: 5px;
+            }
+
+            header img {
+                width: 80px;
+                margin-right: 10px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            #game {
+                width: 90%;
+                margin: 20px auto;
+            }
+
+            .game-title {
+                font-size: 30px;
+                margin: 10px 0;
+            }
+            #level-counter{
+                font-size: 16px;
+            }
+            #score-board span{
+                font-size: 16px;
+                margin: 0 5px; 
+            }
+            #constructed-word {
+                margin-left: 0;
+                font-size: 20px;
+            }
+            #constructed-word {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #current-word {
+                margin:0;
+            }
+            .current-letter {
+                font-size: 20px;
+                padding: 5px;
+                margin: 8px;
+                min-width: 35px;
+                min-height: 35px;
+                line-height: 40px;
+            }
+
+            #buttons button {
+                padding: 8px;
+                font-size: 12px; 
+            }
+
+            .letter-tile {
+                width: 40px; 
+                height: 40px; 
+                font-size: 16px; 
+                margin-left: 5px; 
+                margin-right: 5px; 
+            }
+            #letters{
+                margin-top: 5px;
+            }
+            .chosen-word {
+                font-size: 12px;
+            }
+            #timer {
+                margin-left: 10px;
+                margin-top: 10px;
+                margin-bottom: 20px;
+            }
+            #timer .timer_left_txt {
+                font-size: 16px;
+            }
+            #timer .timer_sec {
+                font-size: 14px;
+                width: 40px;
+            }
+            .footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .chosen-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .chosen-container p {
+                font-size: 14px;
+                margin-left: 10px;
+            }
+            #guessed-words-list{
+                margin: 5px;
+                margin-left: 0px !important;
+                padding:0px !important;
+            }
+            .validation dotlottie-player{
+                width: 50px !important;
+                height: 50px !important;
+            }
+            #replay-popup #replay-content {
+                width: 80%;
+                padding: 20px;
+            }
+            #replay-popup #replay-content h2 {
+                font-size: 18px;
+            }
+            #replay-popup #replay-button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #buttons{
+                margin-bottom: 5px;
+            }
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <header>
+        <img src="logo.jpg" alt="Logo">
+        <h1>சொல் விளையாட்டு</h1>
+    </header>
+    <div id="game">
+        <h1 class = "game-title">சொல் விளையாட்டு</h1>
+        <div id="game-info">
+            <h2 id="level-counter">விளையாட்டு எண்: 1</h2>
+            <div id="score-board">
+                <span>மதிப்பெண்கள்: </span>
+                <span id="score-count"></span>
+            </div>
+        </div>
+        <hr id = "bottomline">
+        <div class = construction>
+            <div id ="constructed-word">சொல் : <span id="current-word"></span></div>
+            <div class = "validation"></div>
+        </div>        
+        <div id="letters">
+            <!-- Letters will be dynamically generated here -->
+        </div>
+        <div id="buttons">
+            <button id="submit-button" style="display: none;">சரிபாரு</button>
+            <button id="next-level-button" style="display: none;">அடுத்த விளையாட்டு</button>
+            <button id="result-button" style="display: none;">மதிப்பெண்ணைக் காண்க</button>
+        </div>
+        <div class = "footer">
+            <div class = "chosen-container">
+                <p>யூகித்த வார்த்தைகள்:</p>
+                <div id="guessed-words-list"></div>
+            </div>
+            <div id = "timer">
+                <div class = "timer_left_txt">நேரம்:</div>
+                <div class = "timer_sec">15</div>
+            </div>
+        </div>
+    </div>
+    <div id="replay-popup">
+        <div class="overlay"></div>
+        <div id="replay-content">
+           <div id = "animation-replay"></div>
+            <div class = "progress-container">
+                <div class = "circular-progress">
+                    <span class = "progress-value"></span>
+                </div>
+            </div>
+            <h2 id = 'final-score'></h2>
+            <h2>வாழ்த்துக்கள்! நீங்கள் விளையாட்டை முடித்துவிட்டீர்கள்</h2>
+            <button id="replay-button">மீண்டும் விளையாடு</button>
+        </div>
+    </div>
+    <canvas id="confetti-canvas"></canvas>
+    <canvas id="x-canvas" style="display: none;"></canvas>
+    <script>
+        const maxWords = 30;
+        const maxWordLength = 30;
+        let currentWord = '';
+        let guessedWordsCount = 0;
+        let totalCorrectWords = 0;
+        let currentLevel = 1;
+        let counter;
+        let points = 0;
+        const lettersContainer = document.getElementById('letters');
+        const ResultButton = document.getElementById('result-button');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const submitButton = document.getElementById('submit-button');
+        const currentWordDisplay = document.getElementById('current-word');
+        const score = document.getElementById('score-count');
+        const guessedWordsList = document.getElementById('guessed-words-list');
+        const levelCounter = document.getElementById('level-counter');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const xCanvas = document.getElementById('x-canvas');
+        const timeText = document.querySelector(".timer_left_txt");
+        const timeCount = document.querySelector(".timer_sec");
+        const timerLine = document.getElementById('bottomline');
+        const finalscore = document.getElementById('final-score');
+        const wordSets = [ {
+    letters: ['நீ', 'தி', 'ம', 'ன்', 'ற', 'ம்'],
+    validWords: ['நீதி', 'திறம்', 'திறன்', 'மன்றம்', 'மறம்']
+  }, {
+    letters: ['வி', 'ழு', 'ப்', 'பு', 'ண்'],
+    validWords: ['விழு', 'புண்', 'புவி', 'விண்', 'புழு']
+  }, {
+    letters: ['வ', 'ரி', 'ந்', 'து', 'க', 'ட்', 'டி', 'க்', 'கொ', 'ண்', 'டு'],
+    validWords: ['வரி', 'கொடி', 'துண்டு', 'வந்து', 'வட்டி', 'கண்டு', 'கண்', 'கட்டி', 'வரிந்துகட்டி']
+  }, {
+    letters: ['அ', 'டி', 'ப்', 'ப', 'டை', 'யி', 'ல்'],
+    validWords: ['அடிப்படை', 'படையில்', 'அடி', 'படை', 'பயில்']
+  }, {
+    letters: ['தே', 'ர்', 'த்', 'தி', 'ரு', 'வி', 'ழா'],
+    validWords: ['தேர்', 'விழா', 'திரு', 'திருவிழா', 'தேதி']
+  }, {
+    letters: ['ஊ', 'ர்', 'க்', 'கு', 'ரு', 'வி', 'க', 'ள்'],
+    validWords: ['ஊர்', 'குருவி', 'கள்', 'குருவிகள்', 'ஊக்கு']
+  }, {
+    letters: ['த', 'லை', 'ப்', 'பு', 'ச்', 'செ', 'ய்', 'தி', 'க', 'ள்'],
+    validWords: ['தலைப்பு', 'செய்தி', 'கள்', 'செய்திகள்', 'தலை', 'செய்']
+  }, {
+    letters: ['எ', 'தி', 'ர்', 'ம', 'றை', 'யி', 'ல்'],
+    validWords: ['எதிர்', 'மறையில்', 'மறை', 'எதில்', 'மயில்', 'திறை']
+  }, {
+    letters: ['மே', 'ல்', 'மு', 'றை', 'யீ', 'டு'],
+    validWords: ['மேல்', 'முறையீடு', 'முறை', 'மேடு', 'மேல்முறை']
+  }, {
+    letters: ['உ', 'ட', 'ன்', 'பி', 'ற', 'ந்', 'த', 'வ', 'ர்', 'க', 'ளி', 'ல்'],
+    validWords: ['உடன்', 'பிறந்தவர்', 'உடன்பிறந்தவர்', 'களி', 'கவர்', 'உடல்', 'பிறந்த', 'கல்', 'கடன்', 'தவர்', 'தவர்களில்', 'உடன்பிறந்த', 'கதர்', 'பிறந்தவன்']
+  }];
+
+
+
+        const maxLevels = wordSets.length;
+        let currentSet = 0;
+        let guessedWords = new Set();
+        guessedWords = new Set();
+        guessedWordsList.innerHTML = ''
+        function initializeBoard() {                
+            lettersContainer.innerHTML = ''; 
+            currentWordDisplay.textContent = '';
+            currentWord = '';
+            console.log("CurrentSet: "+currentSet)
+            const wordSet = wordSets[currentSet];
+            console.log(guessedWordsCount, wordSet.validWords.length);
+
+
+            if (guessedWordsCount < wordSet.validWords.length) {
+                startTimer(20);  
+                const currentValidWord = wordSet.validWords[guessedWordsCount];
+                console.log("Current valid word:", currentValidWord);
+
+                const segmenter = new Intl.Segmenter("ta", { granularity: "grapheme" });
+                const graphemes = Array.from(segmenter.segment(currentValidWord));
+                console.log("Number of grapheme clusters:", graphemes.length);
+
+                const currentLetters = [];
+                for (let i = 0; i < graphemes.length; i++) {
+                    const currentLetter = document.createElement('span');
+                    currentLetter.className = 'current-letter';
+                    currentLetters.push(currentLetter);
+                    currentWordDisplay.appendChild(currentLetter); 
+                }
+                
+                for (let i = 0; i < wordSet.letters.length; i++) {
+                    const letterTile = document.createElement('div');
+                    letterTile.className = 'letter-tile';
+                    letterTile.textContent = wordSet.letters[i];
+                    letterTile.addEventListener('click', () => {
+                        const segmenter = new Intl.Segmenter("ta", { granularity: "grapheme" });
+                        const currentGraphemes = Array.from(segmenter.segment(currentWord));
+                        const validWordGraphemes = Array.from(segmenter.segment(currentValidWord));
+                        console.log(currentGraphemes.length,validWordGraphemes.length)
+                        if (currentGraphemes.length < validWordGraphemes.length) { 
+                            if (currentWord.length === 0) {
+                                currentLetters.forEach(letter => letter.textContent = ''); 
+                            }
+                            const currentLetterIndex = currentGraphemes.length;
+                            currentLetters[currentLetterIndex].textContent = wordSet.letters[i];
+                            currentWord += currentLetters[currentLetterIndex].textContent;
+                        }
+                        if((currentGraphemes.length + 1) === validWordGraphemes.length){
+                            submitButton.style.display = 'block'; // Show submit button
+                        }
+                        
+                    });
+                    lettersContainer.appendChild(letterTile);
+                }
+            } else {   
+                clearInterval(counter);
+                guessedWordsCount = 0;
+                console.log("All words have been guessed!");
+                
+            }
+            guessedWordsCount++
+        }
+
+
+        initializeBoard();
+        const validationanimation = document.querySelector('.validation')
+        const correctAudio = new Audio('correct-ans-audio.wav');
+        const incorrectAudio = new Audio('wrong-buzzer-audio.mp3');
+        const nextlevelAudio = new Audio('next-level-audio.mp3');
+        function playCorrectAudio() {
+            correctAudio.play();
+        }
+        function playIncorrectAudio() {
+            incorrectAudio.play();
+        }
+        function playNextLevelAudio() {
+            nextlevelAudio.play();
+        }
+        submitButton.addEventListener('click', () => {
+            submitButton.style.display = 'none';
+            clearInterval(counter);  
+            const wordSet = wordSets[currentSet];
+            console.log(guessedWordsCount, wordSet.validWords.length)
+            if (guessedWordsCount <= wordSet.validWords.length) {
+                if (wordSet.validWords.includes(currentWord) && !guessedWords.has(currentWord)) {
+                    guessedWords.add(currentWord); 
+                    console.log('No of guesswords are' + guessedWordsCount)
+
+                    const guessedWordsListItem = document.createElement('span');
+                    guessedWordsListItem.textContent = guessedWordsCount === 1 ? currentWord : ` ${currentWord}`;
+                    guessedWordsListItem.classList.add('chosen-word'); // Add the CSS class
+                    guessedWordsList.appendChild(guessedWordsListItem);
+                    const correcttag =  '<dotlottie-player src="https://lottie.host/4bf52fbc-de17-4bc3-997f-7ced7b863fcd/7IfeuoxEmv.json" background="transparent" speed="1" style="width: 70px; height: 70px;" loop = "2" autoplay></dotlottie-player>'
+                    correcttag.className = 'validation-animation';
+                    validationanimation.innerHTML = correcttag;
+                    points++
+                    score.textContent = points
+                    playCorrectAudio();
+                    
+                } 
+                else {
+
+                    const wrongtag = '<dotlottie-player src="https://lottie.host/f17c2adc-a346-4e42-8f31-ad3cf0e35e79/NofnD09mqp.json" background="transparent" speed="1" style="width: 70px; height: 70px;" loop = "2" autoplay></dotlottie-player>'
+                    wrongtag.className = 'validation-animation';
+                    validationanimation.innerHTML = wrongtag;
+                    score.textContent = points 
+                    playIncorrectAudio();
+                }
+                setTimeout(() => {
+                    if (guessedWordsCount === wordSet.validWords.length) {
+                        if (currentLevel + 1 > maxLevels) {
+                            ResultButton.style.display = 'block';
+                        } else {
+                            nextLevelButton.style.display = 'block';
+                        }
+                    } else {
+                        // Initialize board if all words have not been guessed
+                        submitButton.style.display = 'none';
+                        validationanimation.innerHTML = '';
+                        timerLine.style.width = '0';  
+                        initializeBoard();
+                        resetTimer();
+                        }
+                }, 5000);
+                }
+            });
+        
+        function startTimer(time) {
+            counter = setInterval(timer, 1000);
+            function timer() {
+                timeCount.textContent = time; 
+                time--; // decrement of time value
+                const widthPercentage = ((20-time) /20)*100;
+                timerLine.style.width = widthPercentage + "%";
+                if (time < 10) {
+                    timeCount.textContent = "0" + time; 
+                }
+                if (time == 0) {
+                    const wrongtag = '<dotlottie-player src="https://lottie.host/f17c2adc-a346-4e42-8f31-ad3cf0e35e79/NofnD09mqp.json" background="transparent" speed="1" style="width: 70px; height: 70px;" loop = "2" autoplay></dotlottie-player>'
+                    wrongtag.className = 'validation-animation';
+                    validationanimation.innerHTML = wrongtag;
+                    new Audio('wrong-buzzer-audio.mp3').play()
+                    clearInterval(counter); // clear interval
+                    const wordSet = wordSets[currentSet];
+                    setTimeout(() => {
+                        if (guessedWordsCount === wordSet.validWords.length) {
+                        if (currentLevel + 1 > maxLevels) {
+                            ResultButton.style.display = 'block';
+                        } else {
+                            nextLevelButton.style.display = 'block';
+                        }
+                    } else {
+                        // Initialize board if all words have not been guessed
+                        submitButton.style.display = 'none';
+                        validationanimation.innerHTML = '';
+                        timerLine.style.width = '0';  
+                        initializeBoard();
+                        resetTimer();
+                        }
+                }, 5000);
+                }
+            }
+        }
+
+        nextLevelButton.addEventListener('click', () => {
+        validationanimation.innerHTML = '';       
+        guessedWordsList.innerHTML = ''; 
+        currentSet++;
+        currentLevel++;
+        showConfetti();
+        playNextLevelAudio(); 
+        clearInterval(counter);
+        levelCounter.textContent = `விளையாட்டு எண்: ${currentLevel}`;
+        guessedWords.clear();
+        guessedWordsCount = 0;
+        nextLevelButton.style.display = 'none';
+        submitButton.style.display = 'none';
+
+        // Call initializeBoard() once
+        initializeBoard();
+});
+
+        ResultButton.addEventListener('click', () => {           
+                nextLevelButton.style.display = 'none';
+                submitButton.style.display = 'none';
+                showReplayPopup();
+                document.getElementById('game').style.display = 'none'; 
+            }
+        );
+
+        function showConfetti() {
+            confettiCanvas.style.display = 'block';
+            const ctx = confettiCanvas.getContext('2d');
+            const pieces = [];
+            const numPieces = 100;
+            for (let i = 0; i < numPieces; i++) {
+                pieces.push({
+                    x: confettiCanvas.width / 2,
+                    y: confettiCanvas.height / 2,
+                    angle: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 2 + 1,
+                    radius: Math.random() * 4 + 1,
+                    color: randomColor()
+                });
+            }
+            let start = Date.now();
+
+        function drawConfetti() {
+            const timePassed = Date.now() - start;
+            if (timePassed > 2000) {
+                confettiCanvas.style.display = 'none';
+                return;
+            }
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = 0; i < numPieces; i++) {
+                const piece = pieces[i];
+                piece.x += Math.cos(piece.angle) * piece.speed;
+                piece.y += Math.sin(piece.angle) * piece.speed;
+                piece.radius *= 0.98;
+                ctx.beginPath();
+                ctx.arc(piece.x, piece.y, piece.radius, 0, Math.PI * 2);
+                ctx.fillStyle = piece.color;
+                ctx.fill();
+                }
+            requestAnimationFrame(drawConfetti);
+            }
+            drawConfetti();
+        }
+
+        function randomColor() {
+            return `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`;
+        }
+        function resetTimer() {
+            clearInterval(counter); 
+            timeCount.textContent = "20"; 
+            startTimer(20);
+        }
+        if (currentLevel > maxLevels) {
+        showReplayPopup();
+        }
+
+        function showReplayPopup() {
+            finalscore.textContent = 'மதிப்பெண்கள்: ' + points + '/65'
+            const replayPopup = document.getElementById('replay-popup');
+            replayPopup.style.display = 'block';
+            const circularProgress = document.querySelector(".circular-progress");
+            const progressValue = document.querySelector(".progress-value");
+            const animation = document.getElementById("animation-replay");
+            const progressEndValue = (points / 65) * 100;
+            let progressStartValue = 0;
+            const speed = 100;
+            const progress = setInterval(() => {
+            progressStartValue++;
+            progressValue.textContent = `${progressStartValue}%`;
+            circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 3.6}deg, #ededed 0deg)`;
+
+            if (progressStartValue === progressEndValue) {
+                clearInterval(progress);
+            }
+
+            if (progressEndValue === 0) {
+                progressStartValue = 0;
+                progressValue.textContent = `${progressStartValue}%`;
+                circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 3.6}deg, #c8c8c8 0deg)`;
+            }
+        }, speed);
+        console.log(progressEndValue)
+        if(progressEndValue > 75){
+                let animationTag = '<dotlottie-player src="https://lottie.host/a4b636eb-822a-4aff-9d6d-c69c4ade4076/I0zFtbjBDf.json" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay></dotlottie-player>'
+                animation.innerHTML = animationTag;
+            }
+        }
+
+        // Replay button click event
+        const replayButton = document.getElementById('replay-button');
+        const game = document.getElementById('game')
+        replayButton.addEventListener('click', () => {
+            points = 0;
+            score.textContent = points
+            currentLevel = 1;
+            currentSet = 0;
+            guessedWords.clear();
+            guessedWordsCount = 0;
+            currentWord = '';
+            currentWordDisplay.textContent = '';
+            guessedWordsList.innerHTML = '';
+            validationanimation.innerHTML = '';
+            levelCounter.textContent = `விளையாட்டு எண்: ${currentLevel}`;
+            resetTimer();
+            initializeBoard();
+            const replayPopup = document.getElementById('replay-popup');
+            replayPopup.style.display = 'none';
+            game.style.display = 'block';
+            ResultButton.style.display = "none"
+        });
+    </script>
+</body>
+</html>
